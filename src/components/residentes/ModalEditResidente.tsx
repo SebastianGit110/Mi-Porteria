@@ -8,7 +8,7 @@ import {
 } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { updateResidentById } from "../../api/data";
 import { useForm } from "../../hooks/useForm";
@@ -33,7 +33,7 @@ export function ModalEditResidente({
   currentResident,
 }: Args) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { formState, handleOnChange, onResetForm } = useForm<
+  const { formState, setFormState, handleOnChange, onResetForm } = useForm<
     Omit<IResidentF, "id" | "house_num" | "actions">
   >({
     name: undefined,
@@ -79,6 +79,16 @@ export function ModalEditResidente({
     }
   };
 
+  useEffect(() => {
+    setFormState({
+      name: currentResident.name,
+      last_name: currentResident.last_name,
+      phone: currentResident.phone,
+      mail: currentResident.mail,
+      resident_type: currentResident.resident_type,
+    });
+  }, [currentResident]);
+
   return (
     <>
       <Modal
@@ -101,6 +111,7 @@ export function ModalEditResidente({
                       label="Nombre(s)"
                       type="text"
                       name="name"
+                      value={name}
                       onChange={handleOnChange}
                     />
                     <Input
@@ -108,6 +119,7 @@ export function ModalEditResidente({
                       label="Apellido(s)"
                       type="text"
                       name="last_name"
+                      value={last_name}
                       onChange={handleOnChange}
                     />
                   </div>
@@ -118,6 +130,7 @@ export function ModalEditResidente({
                       label="Email"
                       type="email"
                       name="mail"
+                      value={mail}
                       onChange={handleOnChange}
                     />
                     <Input
@@ -125,6 +138,7 @@ export function ModalEditResidente({
                       label="Teléfono"
                       type="number"
                       name="phone"
+                      value={phone ? phone.toString() : ""}
                       onChange={handleOnChange}
                     />
                   </div>
@@ -134,6 +148,11 @@ export function ModalEditResidente({
                       className="w-1/2"
                       label="Tipo"
                       name="resident_type"
+                      defaultSelectedKeys={
+                        currentResident.resident_type === "Propietario"
+                          ? ["Propietario"]
+                          : ["Arrendatario"]
+                      }
                       onChange={handleOnChange}
                     >
                       {rType.map((elem: any) => (

@@ -8,7 +8,7 @@ import {
 } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { IParqueaderoF } from "../../types/Person";
 import { useForm } from "../../hooks/useForm";
@@ -43,7 +43,7 @@ export function ModalEditParqueadero({
   setRefresh,
   currentParking,
 }: Args) {
-  const { formState, handleOnChange, onResetForm } =
+  const { formState, setFormState, handleOnChange, onResetForm } =
     useForm<typeof initialState>(initialState);
 
   const { license, state, type } = formState;
@@ -78,6 +78,19 @@ export function ModalEditParqueadero({
     }
   };
 
+  useEffect(() => {
+    console.log({
+      type: currentParking.type,
+      license: currentParking.license,
+      state: currentParking.state,
+    });
+    setFormState({
+      type: currentParking.type,
+      license: currentParking.license,
+      state: currentParking.state,
+    });
+  }, [currentParking]);
+
   return (
     <>
       <Modal
@@ -98,6 +111,9 @@ export function ModalEditParqueadero({
                       className="w-1/2"
                       label="Tipo"
                       name="type"
+                      defaultSelectedKeys={
+                        currentParking.type === "Carro" ? ["Carro"] : ["Moto"]
+                      }
                       onChange={handleOnChange}
                     >
                       {vType.map((elem: any) => (
@@ -110,6 +126,7 @@ export function ModalEditParqueadero({
                       label="Placa"
                       type="text"
                       name="license"
+                      value={license}
                       onChange={handleOnChange}
                     />
                   </div>
@@ -119,6 +136,9 @@ export function ModalEditParqueadero({
                       className="w-1/2"
                       label="Acceso"
                       name="state"
+                      defaultSelectedKeys={
+                        currentParking.state ? ["Si"] : ["No"]
+                      }
                       onChange={handleOnChange}
                     >
                       {sType.map((elem: any) => (
