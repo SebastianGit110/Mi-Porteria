@@ -102,3 +102,8 @@ export const updateParkingById = async (
       "Content-Type": "application/json",
     },
   });
+
+// Visitantes
+
+export const getAllVisits = async () =>
+  await axios.get(`http://localhost:3000/getAllVisits`);

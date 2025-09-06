@@ -70,7 +70,7 @@ export const deleteHouseByNumber = async (req, res) => {
 // Actualizar una casa por su id
 export const updateHouseById = async (req, res) => {
   const { id, isStore, block } = req.body;
-  
+
   try {
     const [existing] = await pool.query("SELECT * FROM casa WHERE id = ?", [
       id,
@@ -196,14 +196,24 @@ export const updateResidentById = async (req, res) => {
 
 // Obtiene todos los parqueaderos
 export const getAllParkings = async (req, res) => {
-  const [response] = await pool.query(`
-    SELECT co.id, p.house_num, co.type, co.license, co.state
-    FROM parqueadero co
-    JOIN casa p ON co.house_id = p.id`);
+  try {
+    const [response] = await pool.query(`
+      SELECT 
+        co.id, 
+        p.house_num, 
+        co.type, 
+        co.license, 
+        co.state
+      FROM parqueadero co
+      JOIN casa p ON co.house_id = p.id
+    `);
 
-  console.log(response);
-
-  res.json(response);
+    console.log(response);
+    res.json(response);
+  } catch (error) {
+    console.error("Error al obtener los parqueaderos:", error);
+    res.status(500).json({ error: "Error al obtener los parqueaderos" });
+  }
 };
 
 // Registra un nuevo parqueadero
@@ -284,5 +294,36 @@ export const updateParkingById = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error actualizando parqueadero" });
+  }
+};
+
+// Visitantes
+
+// Obtiene todos los registros de las visitas
+export const getAllVisits = async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT 
+        vi.id,
+        vi.state,
+        vi.vehicle,
+        vi.photo,
+        vi.description,
+        c.house_num
+      FROM visitantes vi
+      JOIN casa c ON vi.house_id = c.id
+    `);
+
+    const result = rows.map((row) => ({
+      ...row,
+      state: row.state ? JSON.parse(row.state) : null,
+      vehicle: row.vehicle ? JSON.parse(row.vehicle) : null,
+    }));
+
+    console.log(result);
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al obtener las visitas" });
   }
 };

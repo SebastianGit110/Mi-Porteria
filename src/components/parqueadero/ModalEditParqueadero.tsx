@@ -79,11 +79,6 @@ export function ModalEditParqueadero({
   };
 
   useEffect(() => {
-    console.log({
-      type: currentParking.type,
-      license: currentParking.license,
-      state: currentParking.state,
-    });
     setFormState({
       type: currentParking.type,
       license: currentParking.license,

@@ -12,6 +12,7 @@ import {
   createParking,
   deleteParkingById,
   updateParkingById,
+  getAllVisits,
 } from "../controllers/data.controllers.js";
 
 const router = Router();
@@ -33,5 +34,8 @@ router.get("/getAllParkings", getAllParkings);
 router.post("/createParking", createParking);
 router.delete("/deleteParkingById/:id", deleteParkingById);
 router.put("/updateParkingById", updateParkingById);
+
+// Visitantes
+router.get("/getAllVisits", getAllVisits);
 
 export default router;
