@@ -1,4 +1,6 @@
 import { Router } from "express";
+import multer from "multer";
+import fs from "node:fs";
 import {
   getAllHouses,
   getResidentsByHouseId,
@@ -16,6 +18,8 @@ import {
 } from "../controllers/data.controllers.js";
 
 const router = Router();
+
+const upload = multer({ dest: "uploads/" });
 
 // Casas
 router.get("/getAllHouses", getAllHouses);
@@ -37,5 +41,26 @@ router.put("/updateParkingById", updateParkingById);
 
 // Visitantes
 router.get("/getAllVisits", getAllVisits);
+
+// Imagenes
+router.post("/images/single", upload.single("photo"), (req, res) => {
+  try {
+    console.log(req.file);
+    const newPath = saveImage(req.file);
+
+    console.log("NEWPATH", newPath);
+    res.send("Termina");
+  } catch (error) {
+    console.log;
+  }
+});
+
+const saveImage = (file) => {
+  const newPath = `./uploads/${file.originalname}`;
+
+  console.log(newPath);
+  fs.renameSync(file.path, newPath);
+  return newPath;
+};
 
 export default router;

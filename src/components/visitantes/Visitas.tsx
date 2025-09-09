@@ -1,4 +1,4 @@
-import { Button } from "@heroui/react";
+import { Button, useDisclosure } from "@heroui/react";
 import {
   MaterialReactTable,
   MRT_ColumnDef,
@@ -8,10 +8,13 @@ import { useEffect, useMemo, useState } from "react";
 import { IVisitantesF } from "../../types/Person";
 import { getAllVisits } from "../../api/data";
 import { Chip } from "@heroui/chip";
+import { ModalVisitas } from "./ModalVisitas";
 
 export const Visitas = () => {
   const [data, setData] = useState<IVisitantesF[]>([]);
   const [refresh, setRefresh] = useState(false);
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
     const fetchAllVisits = async () => {
@@ -163,7 +166,7 @@ export const Visitas = () => {
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
         <button
           className="bg-[#a4f4cf] p-2.5 w-3xs text-emerald-800 hover:font-bold rounded cursor-pointer"
-          onClick={() => {}}
+          onClick={() => onOpen()}
         >
           Registrar Visita
         </button>
@@ -216,12 +219,16 @@ export const Visitas = () => {
   });
 
   return (
-    <div className="flex justify-center p-8 min-h-screen">
-      <div className="w-full max-w-6xl">
-        <h1 className="text-2xl font-bold text-emerald-800 mb-6">Visitas</h1>
+    <>
+      <div className="flex justify-center p-8 min-h-screen">
+        <div className="w-full max-w-6xl">
+          <h1 className="text-2xl font-bold text-emerald-800 mb-6">Visitas</h1>
 
-        <MaterialReactTable table={table} />
+          <MaterialReactTable table={table} />
+        </div>
       </div>
-    </div>
+
+      <ModalVisitas isOpenVisitas={isOpen} onOpenChangeVisitas={onOpenChange} />
+    </>
   );
 };
