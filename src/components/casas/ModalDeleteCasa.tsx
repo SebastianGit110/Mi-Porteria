@@ -34,17 +34,14 @@ export function ModalDeleteCasa({
 
       toast.success(response.data.message);
 
-      setIsLoading(false);
       setRefresh((value: any) => !value);
     } catch (error: any) {
       console.error("Error al eliminar la casa:", error);
 
       toast.error(error.response.data.message);
-
-      onClose();
-      setIsLoading(false);
     } finally {
       onClose();
+      setIsLoading(false);
     }
   };
 

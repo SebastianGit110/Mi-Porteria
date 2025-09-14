@@ -114,3 +114,18 @@ export const createVisits = async (data: Omit<IVisitantesF, "id">) =>
       "Content-Type": "application/json",
     },
   });
+
+export const deleteVisitById = async (data: {
+  id: string;
+  photo: string | null;
+}) =>
+  await axios.delete(
+    `http://localhost:3000/deleteVisitById/${data.id}/${data.photo}`
+  );
+
+export const updateVisitById = async (data: IVisitantesF) =>
+  await axios.put(`http://localhost:3000/updateVisitById`, data, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });

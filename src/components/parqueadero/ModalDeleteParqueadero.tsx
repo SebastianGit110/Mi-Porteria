@@ -33,11 +33,10 @@ export function ModalDeleteParqueadero({
       const response = await deleteParkingById(currentParking.id);
       toast.success(response.data.message);
 
-      setIsLoading(false);
-      onClose();
       setRefresh((value: any) => !value);
     } catch (error: any) {
       toast.error(error.response.data.message);
+    } finally {
       setIsLoading(false);
       onClose();
     }

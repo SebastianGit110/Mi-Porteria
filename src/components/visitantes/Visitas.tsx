@@ -10,6 +10,8 @@ import { getAllVisits } from "../../api/data";
 import { Chip } from "@heroui/chip";
 import { ModalVisitas } from "./ModalVisitas";
 import { ModalVisitasView } from "./ModalVisitasView";
+import { ModalEditVisitas } from "./ModalEditVisitas";
+import { ModalDeleteVisitas } from "./ModalDeleteVisitas";
 
 export const Visitas = () => {
   const [data, setData] = useState<IVisitantesF[]>([]);
@@ -17,10 +19,23 @@ export const Visitas = () => {
   const [refresh, setRefresh] = useState(false);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const {
     isOpen: isOpenVisit,
     onOpen: onOpenVisit,
     onOpenChange: onOpenChangeVisit,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenEditVisit,
+    onOpen: onOpenEditVisit,
+    onOpenChange: onOpenChangeEditVisit,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenDelete,
+    onOpen: onOpenDelete,
+    onOpenChange: onOpenChangeDelete,
   } = useDisclosure();
 
   useEffect(() => {
@@ -149,7 +164,10 @@ export const Visitas = () => {
             <Button
               className="w-10 bg-[#a4f4cf] rounded-sm text-xs flex items-center justify-center overflow-hidden"
               style={{ minWidth: "auto" }}
-              onPress={() => {}}
+              onPress={() => {
+                setCurrentVisit(cell.row.original);
+                onOpenEditVisit();
+              }}
             >
               ✏️
             </Button>
@@ -158,7 +176,10 @@ export const Visitas = () => {
               style={{ minWidth: "auto" }}
               color="danger"
               variant="light"
-              onPress={() => {}}
+              onPress={() => {
+                setCurrentVisit(cell.row.original);
+                onOpenDelete();
+              }}
             >
               🗑️
             </Button>
@@ -194,10 +215,8 @@ export const Visitas = () => {
     ),
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
-        console.log("fila", row.original);
         setCurrentVisit(row.original);
         onOpenVisit();
-        // alert(`Haz hecho clic en: ${row.original} ${row.original}`);
       },
       style: {
         cursor: "pointer",
@@ -258,6 +277,18 @@ export const Visitas = () => {
       <ModalVisitasView
         isOpenVisitas={isOpenVisit}
         onOpenChangeVisitas={onOpenChangeVisit}
+        currentVisit={currentVisit}
+      />
+      <ModalEditVisitas
+        isOpenEditVisitas={isOpenEditVisit}
+        onOpenChangeEditVisitas={onOpenChangeEditVisit}
+        currentVisit={currentVisit}
+        setRefresh={setRefresh}
+      />
+      <ModalDeleteVisitas
+        isOpenDelete={isOpenDelete}
+        onOpenChangeDelete={onOpenChangeDelete}
+        setRefresh={setRefresh}
         currentVisit={currentVisit}
       />
     </>

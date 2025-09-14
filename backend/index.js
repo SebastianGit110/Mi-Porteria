@@ -19,13 +19,13 @@ console.log("ESTOY EN 2:", path.join(__dirname, "..", "..", "..", "uploads"));
 console.log("ESTOY EN 3:", path.join(__dirname, "..", "uploads"));
 
 // Prod
-// app.use(
-//   "/uploads",
-//   express.static(path.join(__dirname, "..", "..", "..", "uploads"))
-// );
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "..", "..", "..", "uploads"))
+);
 
 // Dev
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 app.listen(PORT, () => {
   console.log(`El servidor esta corriendo en el puerto ${PORT}`);

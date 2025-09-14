@@ -16,6 +16,8 @@ import {
   updateParkingById,
   getAllVisits,
   createVisits,
+  updateVisitById,
+  deleteVisitById,
 } from "../controllers/data.controllers.js";
 
 const router = Router();
@@ -43,6 +45,8 @@ router.put("/updateParkingById", updateParkingById);
 // Visitantes
 router.get("/getAllVisits", getAllVisits);
 router.post("/createVisits", createVisits);
+router.delete("/deleteVisitById/:id/:photo", deleteVisitById);
+router.put("/updateVisitById", updateVisitById);
 
 // Imagenes
 router.post("/images/single", upload.single("photo"), (req, res) => {

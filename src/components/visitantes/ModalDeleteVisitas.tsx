@@ -7,22 +7,22 @@ import {
   Button,
 } from "@heroui/react";
 import { useState } from "react";
-import { deleteResidentById } from "../../api/data";
 import { toast } from "react-toastify";
-import { IResidentF } from "../../types/Person";
+import { IVisitantesF } from "../../types/Person";
+import { deleteVisitById } from "../../api/data";
 
 interface Args {
   isOpenDelete: boolean;
   onOpenChangeDelete: () => void;
   setRefresh: (value: any) => void;
-  currentResident: Omit<IResidentF, "house_num" | "actions">;
+  currentVisit: IVisitantesF | null;
 }
 
-export function ModalDeleteResidente({
+export function ModalDeleteVisitas({
   isOpenDelete,
   onOpenChangeDelete,
   setRefresh,
-  currentResident,
+  currentVisit,
 }: Args) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -30,7 +30,12 @@ export function ModalDeleteResidente({
     try {
       setIsLoading(true);
 
-      const response = await deleteResidentById({ id: currentResident.id });
+      const response = await deleteVisitById({
+        id: currentVisit?.id!,
+        photo: currentVisit?.photo
+          ? currentVisit.photo.replace(/\/uploads\//g, "")
+          : null,
+      });
       toast.success(response.data.message);
 
       setRefresh((value: any) => !value);
@@ -53,12 +58,13 @@ export function ModalDeleteResidente({
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1 text-emerald-800">
-                Eliminar Residente
+                Eliminar Visita
               </ModalHeader>
               <ModalBody>
                 <div className="flex flex-col items-center gap-4">
-                  ¿Estás seguro que deseas eliminar el residente{" "}
-                  {currentResident.name} {currentResident.last_name}?
+                  ¿Estás seguro que deseas eliminar la visita{" "}
+                  {currentVisit?.name} que visitó la casa{" "}
+                  {currentVisit?.house_num}?
                 </div>
               </ModalBody>
               <ModalFooter>

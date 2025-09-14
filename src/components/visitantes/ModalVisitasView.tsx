@@ -10,7 +10,6 @@ import {
   Input,
   Textarea,
 } from "@heroui/react";
-import { useState } from "react";
 import { IVisitantesF } from "../../types/Person";
 
 interface Args {
@@ -24,7 +23,7 @@ const vType = [
   { key: "Moto", label: "Moto" },
 ];
 
-const formatDateTimeLocal = (date: Date) => {
+export const formatDateTimeLocal = (date: Date) => {
   const pad = (n: number) => (n < 10 ? "0" + n : n);
   return (
     date.getFullYear() +
@@ -39,26 +38,11 @@ const formatDateTimeLocal = (date: Date) => {
   );
 };
 
-const initialState: Omit<IVisitantesF, "id"> = {
-  house_num: null,
-  name: null,
-  state: { entered: null, left: null },
-  vehicle: { type: null, color: null, license: null },
-  photo: null,
-  description: null,
-};
-
 export function ModalVisitasView({
   isOpenVisitas,
   onOpenChangeVisitas,
   currentVisit,
 }: Args) {
-  const [data, setData] = useState<typeof initialState>(initialState);
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  console.log("CURRENT VISIT", currentVisit);
-
   return (
     <>
       <Modal
@@ -187,6 +171,9 @@ export function ModalVisitasView({
 
                     {currentVisit?.vehicle && (
                       <>
+                        <label className="block text-sm font-medium text-gray-700 -mb-2">
+                          Color
+                        </label>
                         <Input
                           className="w-full"
                           value={
@@ -195,12 +182,17 @@ export function ModalVisitasView({
                               : ""
                           }
                           autoComplete="off"
-                          label="Color"
                           type="text"
                           name="color"
                           readOnly
+                          classNames={{
+                            inputWrapper: "min-h-12",
+                          }}
                         />
 
+                        <label className="block text-sm font-medium text-gray-700 -mb-2">
+                          Placa
+                        </label>
                         <Input
                           className="w-full"
                           value={
@@ -209,12 +201,17 @@ export function ModalVisitasView({
                               : ""
                           }
                           autoComplete="off"
-                          label="Placa"
                           type="text"
                           name="license"
                           readOnly
+                          classNames={{
+                            inputWrapper: "min-h-12",
+                          }}
                         />
 
+                        <label className="block text-sm font-medium text-gray-700 -mb-2">
+                          Tipo
+                        </label>
                         <Select
                           className="w-full"
                           defaultSelectedKeys={

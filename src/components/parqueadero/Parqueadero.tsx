@@ -46,17 +46,17 @@ export const Parqueadero = () => {
 
   const columns = useMemo<MRT_ColumnDef<IParqueaderoF>[]>(
     () => [
-      {
-        accessorKey: "id",
-        header: "Id",
-        muiTableHeadCellProps: {
-          style: {
-            color: "oklch(43.2% 0.095 166.913)",
-            fontSize: "14px",
-          },
-        },
-        enableHiding: false,
-      },
+      // {
+      //   accessorKey: "id",
+      //   header: "Id",
+      //   muiTableHeadCellProps: {
+      //     style: {
+      //       color: "oklch(43.2% 0.095 166.913)",
+      //       fontSize: "14px",
+      //     },
+      //   },
+      //   enableHiding: false,
+      // },
       {
         accessorKey: "house_num",
         header: "Casa",

@@ -3,11 +3,11 @@ import { NavLink } from "react-router-dom";
 
 const options = [
   { fijo: "Portería" },
-  "correspondencia",
+  // "correspondencia",
   "visitas",
-  "domicilios",
+  // "domicilios",
   "parqueadero",
-  "minuta",
+  // "minuta",
   { fijo: "Gestión" },
   "casas",
 ];

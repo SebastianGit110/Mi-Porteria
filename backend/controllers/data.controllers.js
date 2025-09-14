@@ -1,4 +1,10 @@
 import { pool } from "../db.js";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "node:fs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Casas
 
@@ -267,8 +273,10 @@ export const deleteParkingById = async (req, res) => {
       .status(200)
       .json({ message: "Parqueadero eliminado correctamente" });
   } catch (error) {
-    console.error("Error al eliminar el prqueadero:", error);
-    return res.status(500).json({ message: "Error al eliminar el prqueadero" });
+    console.error("Error al eliminar el parqueadero:", error);
+    return res
+      .status(500)
+      .json({ message: "Error al eliminar el parqueadero" });
   }
 };
 
@@ -329,6 +337,7 @@ export const getAllVisits = async (req, res) => {
   }
 };
 
+// Registra una nueva visita
 export const createVisits = async (req, res) => {
   const { house_num, name, state, vehicle, photo, description } = req.body;
   try {
@@ -364,5 +373,79 @@ export const createVisits = async (req, res) => {
     res.status(201).json({ message: "Visita creada correctamente" });
   } catch (error) {
     console.error("Error creando visitas", error);
+  }
+};
+
+// Actualizar una visita por su id
+export const updateVisitById = async (req, res) => {
+  const { id, name, state, vehicle, description } = req.body;
+
+  try {
+    const [existing] = await pool.query(
+      "SELECT * FROM visitantes WHERE id = ?",
+      [id]
+    );
+    if (existing.length === 0) {
+      return res.status(404).json({ message: "Visita no encontrado" });
+    }
+
+    await pool.query(
+      "UPDATE visitantes SET nombre = ?, state = ?, vehicle = ?, description = ? WHERE id = ?",
+      [name, JSON.stringify(state), JSON.stringify(vehicle), description, id]
+    );
+
+    res.json({ message: "Visita actualizada correctamente" });
+  } catch (error) {
+    console.error("Error editando visitas", error);
+    res.status(500).json({ message: "Error actualizando visita" });
+  }
+};
+
+// Elimina un parqueadero por su id
+export const deleteVisitById = async (req, res) => {
+  try {
+    const { id, photo } = req.params;
+
+    // Dev
+    // const fullPath = path.join(
+    //   __dirname,
+    //   "../../uploads",
+    //   path.basename(photo)
+    // );
+
+    // Prod
+    const fullPath = path.join(
+      __dirname,
+      "../../../uploads",
+      path.basename(photo)
+    );
+
+    console.log("AL ELIMINAR UNA VISITA", id, photo);
+    console.log("DIRNAME", __dirname);
+    console.log("fullPath", fullPath);
+
+    if (photo && photo !== null && photo !== "" && photo !== "null") {
+      fs.unlink(fullPath, (err) => {
+        if (err) {
+          console.error("Error eliminando foto:", err);
+          return res
+            .status(500)
+            .json({ message: "No se pudo eliminar la foto" });
+        }
+      });
+    }
+
+    const [result] = await pool.query("DELETE FROM visitantes WHERE id = ?", [
+      id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Visita no encontrada" });
+    }
+
+    return res.status(200).json({ message: "Visita eliminada correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar la visita:", error);
+    return res.status(500).json({ message: "Error al eliminar la visita" });
   }
 };
