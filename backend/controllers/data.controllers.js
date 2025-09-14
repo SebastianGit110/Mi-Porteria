@@ -416,7 +416,7 @@ export const deleteVisitById = async (req, res) => {
     // Prod
     const fullPath = path.join(
       __dirname,
-      "../../../uploads",
+      "../../../../uploads",
       path.basename(photo)
     );
 
