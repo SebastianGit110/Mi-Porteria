@@ -309,6 +309,7 @@ export const getAllVisits = async (req, res) => {
         vi.vehicle,
         vi.photo,
         vi.description,
+        vi.nombre as name,
         c.house_num
       FROM visitantes vi
       JOIN casa c ON vi.house_id = c.id
@@ -325,5 +326,43 @@ export const getAllVisits = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al obtener las visitas" });
+  }
+};
+
+export const createVisits = async (req, res) => {
+  const { house_num, name, state, vehicle, photo, description } = req.body;
+  try {
+    // Verifica si la casa existe
+    const [existing] = await pool.query(
+      "SELECT * FROM casa WHERE house_num = ?",
+      [house_num]
+    );
+
+    if (existing.length === 0) {
+      res.status(401).json({ message: "La casa no está registrada" });
+    }
+
+    const response = await pool.query(
+      `
+      INSERT INTO visitantes (id, house_id, nombre, state, vehicle, photo, description)
+      VALUES (
+        UUID(),
+        (SELECT id FROM casa WHERE house_num = ?),
+        ?, ?, ?, ?, ?
+      );
+      `,
+      [
+        house_num,
+        name,
+        JSON.stringify(state),
+        JSON.stringify(vehicle),
+        photo,
+        description,
+      ]
+    );
+
+    res.status(201).json({ message: "Visita creada correctamente" });
+  } catch (error) {
+    console.error("Error creando visitas", error);
   }
 };

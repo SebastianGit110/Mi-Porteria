@@ -30,11 +30,16 @@ export interface ICorrespondenciaF {
 
 export interface IVisitantesF {
   id: string;
-  house_num: number;
-  state: { entered: string; left: string };
-  vehicle: { type: string; color: string; license: string };
-  photo: string;
-  description: string;
+  house_num: number | null;
+  name: string | null;
+  state: { entered: Date | null | string; left: Date | null | string };
+  vehicle: {
+    type: "Carro" | "Moto" | null;
+    color: string | null;
+    license: string | null;
+  } | null;
+  photo: string | null;
+  description: string | null;
 }
 
 export interface IDomiciliosF {

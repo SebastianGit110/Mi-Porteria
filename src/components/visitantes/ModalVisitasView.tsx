@@ -8,26 +8,36 @@ import {
   Select,
   SelectItem,
   Input,
-  Checkbox,
   Textarea,
 } from "@heroui/react";
-import axios from "axios";
-import { useRef, useState } from "react";
-import WebCam from "react-webcam";
+import { useState } from "react";
 import { IVisitantesF } from "../../types/Person";
-import { createVisits } from "../../api/data";
-import { toast } from "react-toastify";
 
 interface Args {
   isOpenVisitas: boolean;
   onOpenChangeVisitas: () => void;
-  setRefresh: (value: any) => void;
+  currentVisit: IVisitantesF | null;
 }
 
 const vType = [
   { key: "Carro", label: "Carro" },
   { key: "Moto", label: "Moto" },
 ];
+
+const formatDateTimeLocal = (date: Date) => {
+  const pad = (n: number) => (n < 10 ? "0" + n : n);
+  return (
+    date.getFullYear() +
+    "-" +
+    pad(date.getMonth() + 1) +
+    "-" +
+    pad(date.getDate()) +
+    "T" +
+    pad(date.getHours()) +
+    ":" +
+    pad(date.getMinutes())
+  );
+};
 
 const initialState: Omit<IVisitantesF, "id"> = {
   house_num: null,
@@ -38,109 +48,16 @@ const initialState: Omit<IVisitantesF, "id"> = {
   description: null,
 };
 
-const allVariablesFilled = (data: typeof initialState): boolean => {
-  return (
-    data.house_num !== null &&
-    data.name !== null &&
-    data.name !== "" &&
-    data.description !== null &&
-    data.description !== "" &&
-    data.state.entered !== null &&
-    data.state.entered !== ""
-  );
-};
-
-export function ModalVisitas({
+export function ModalVisitasView({
   isOpenVisitas,
   onOpenChangeVisitas,
-  setRefresh,
+  currentVisit,
 }: Args) {
-  const [imagenSrc, setimagenSrc] = useState(null);
-
-  const [hasVehicle, setHasVehicle] = useState<boolean>(false);
-
   const [data, setData] = useState<typeof initialState>(initialState);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const webCamRef = useRef<any>();
-
-  const handleOnCapture = async () => {
-    const imagenSrc = webCamRef.current.getScreenshot();
-    setimagenSrc(imagenSrc);
-    console.log(imagenSrc);
-
-    const response = await fetch(imagenSrc);
-    const blob = await response.blob();
-
-    const formData = new FormData();
-    formData.append("photo", blob, `captura-${Date.now()}.png`);
-
-    const responseImg = await axios.post(
-      "http://localhost:3000/images/single",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    console.log("LA RESPUEST SAVE IMG", responseImg);
-    console.log("PATH", responseImg.data.substring(1));
-
-    handleChangeNormal({
-      target: { name: "photo", value: responseImg.data.substring(1) },
-    });
-  };
-
-  const handleChangeNormal = (
-    event: React.ChangeEvent<HTMLInputElement> | any
-  ) => {
-    const { name, value } = event.target;
-
-    setData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleChange =
-    (section: "vehicle" | "state") =>
-    (
-      event:
-        | React.ChangeEvent<HTMLInputElement>
-        | React.ChangeEvent<HTMLSelectElement>
-    ) => {
-      const { name, value } = event.target;
-
-      setData((prev) => ({
-        ...prev,
-        [section]: {
-          ...prev[section],
-          [name]: name === "state" ? (value ? new Date(value) : null) : value,
-        },
-      }));
-    };
-
-  const handleSubmit = async (onClose: () => void) => {
-    setIsLoading(true);
-
-    try {
-      // Si no tiene vehiculo lo manda null
-      const visitData = hasVehicle ? data : { ...data, vehicle: null };
-      const response = await createVisits(visitData);
-
-      toast.success(response.data.message);
-      setRefresh((value: boolean) => !value);
-    } catch (error: any) {
-      toast.error(error.response.data.message);
-    } finally {
-      setIsLoading(false);
-      onClose();
-      setData(initialState);
-    }
-  };
+  console.log("CURRENT VISIT", currentVisit);
 
   return (
     <>
@@ -153,7 +70,7 @@ export function ModalVisitas({
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1 text-emerald-800">
-                Agregar Visitas
+                Visita
               </ModalHeader>
               <ModalBody>
                 <div
@@ -188,7 +105,12 @@ export function ModalVisitas({
                       autoComplete="off"
                       type="number"
                       name="house_num"
-                      onChange={handleChangeNormal}
+                      readOnly
+                      value={
+                        currentVisit?.house_num
+                          ? currentVisit.house_num.toString()
+                          : ""
+                      }
                       classNames={{
                         inputWrapper: "min-h-12",
                       }}
@@ -202,7 +124,8 @@ export function ModalVisitas({
                       autoComplete="off"
                       type="text"
                       name="name"
-                      onChange={handleChangeNormal}
+                      readOnly
+                      value={currentVisit?.name ? currentVisit.name : ""}
                       classNames={{
                         inputWrapper: "min-h-12",
                       }}
@@ -212,24 +135,36 @@ export function ModalVisitas({
                       Entrada
                     </label>
                     <input
-                      // value={fechaHora ? formatDateTimeLocal(fechaHora) : ""}
+                      readOnly
+                      value={
+                        currentVisit?.state.entered
+                          ? formatDateTimeLocal(
+                              new Date(currentVisit?.state.entered)
+                            )
+                          : ""
+                      }
                       type="datetime-local"
                       className="w-full max-w-sm rounded-xl bg-gray-100 px-4 py-3.5 text-gray-800
                       focus:outline-none focus:ring-2 focus:ring-emerald-800 transition-all duration-200"
                       name="entered"
-                      onChange={handleChange("state")}
                     />
 
                     <label className="block text-sm font-medium text-gray-700 -mb-2">
                       Salida
                     </label>
                     <input
-                      // value={fechaHora ? formatDateTimeLocal(fechaHora) : ""}
+                      readOnly
+                      value={
+                        currentVisit?.state.left
+                          ? formatDateTimeLocal(
+                              new Date(currentVisit?.state.left)
+                            )
+                          : ""
+                      }
                       type="datetime-local"
                       className="w-full max-w-sm rounded-xl bg-gray-100 px-4 py-3.5 text-gray-800
                       focus:outline-none focus:ring-2 focus:ring-emerald-800 transition-all duration-200"
                       name="left"
-                      onChange={handleChange("state")}
                     />
 
                     <label className="block text-sm font-medium text-gray-700 -mb-2">
@@ -239,49 +174,58 @@ export function ModalVisitas({
                       minRows={1}
                       maxRows={4}
                       name="description"
-                      onChange={handleChangeNormal}
+                      readOnly
+                      value={
+                        currentVisit?.description
+                          ? currentVisit?.description
+                          : ""
+                      }
                       classNames={{
                         input: "max-h-24 min-h-8 overflow-y-auto",
                       }}
                     />
 
-                    <div className="flex justify-between w-[16.5rem] my-4">
-                      <span className="ml-4 text-sm font-medium text-gray-700">
-                        ¿Tiene vehículo?
-                      </span>
-                      <Checkbox
-                        color="default"
-                        isSelected={hasVehicle}
-                        onChange={(e) => setHasVehicle(e.target.checked)}
-                      />
-                    </div>
-
-                    {hasVehicle && (
+                    {currentVisit?.vehicle && (
                       <>
                         <Input
                           className="w-full"
+                          value={
+                            currentVisit.vehicle.color
+                              ? currentVisit.vehicle.color
+                              : ""
+                          }
                           autoComplete="off"
                           label="Color"
                           type="text"
                           name="color"
-                          onChange={handleChange("vehicle")}
+                          readOnly
                         />
 
                         <Input
                           className="w-full"
+                          value={
+                            currentVisit.vehicle.license
+                              ? currentVisit.vehicle.license
+                              : ""
+                          }
                           autoComplete="off"
                           label="Placa"
                           type="text"
                           name="license"
-                          onChange={handleChange("vehicle")}
+                          readOnly
                         />
 
                         <Select
                           className="w-full"
+                          defaultSelectedKeys={
+                            currentVisit.vehicle.type === "Carro"
+                              ? ["Carro"]
+                              : ["Moto"]
+                          }
                           autoComplete="off"
                           label="Tipo"
                           name="type"
-                          onChange={handleChange("vehicle")}
+                          isDisabled
                         >
                           {vType.map((elem: any) => (
                             <SelectItem key={elem.key}>{elem.label}</SelectItem>
@@ -291,34 +235,8 @@ export function ModalVisitas({
                     )}
                   </div>
 
-                  {/* Column central: Cámara */}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "16px",
-                      minWidth: "280px",
-                      margin: "auto auto",
-                    }}
-                  >
-                    <WebCam
-                      style={{
-                        borderRadius: "12px",
-                        boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
-                      }}
-                      height="270px"
-                      width="360px"
-                      audio={false}
-                      ref={webCamRef}
-                      screenshotFormat="image/png"
-                    />
-                    <Button color="default" onPress={handleOnCapture}>
-                      Capturar
-                    </Button>
-                  </div>
-
                   {/* Column derecha: Imagen capturada */}
-                  {imagenSrc && (
+                  {currentVisit?.photo && (
                     <div
                       style={{
                         display: "flex",
@@ -329,7 +247,7 @@ export function ModalVisitas({
                       }}
                     >
                       <img
-                        src={imagenSrc}
+                        src={`http://localhost:3000${currentVisit.photo}`}
                         style={{
                           height: "210px",
                           width: "360px",
@@ -338,53 +256,11 @@ export function ModalVisitas({
                           boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
                         }}
                       />
-                      <Button
-                        className="bg-red-200"
-                        style={{ borderRadius: "12px" }}
-                        color="danger"
-                        variant="light"
-                        onPress={() => {
-                          setimagenSrc(null);
-                        }}
-                      >
-                        Cancelar
-                      </Button>
                     </div>
                   )}
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button
-                  onPress={() => handleSubmit(onClose)}
-                  isLoading={isLoading}
-                  color="secondary"
-                  className="text-emerald-800 bg-[#a4f4cf] rounded-sm"
-                  isDisabled={!allVariablesFilled(data)}
-                  spinner={
-                    <svg
-                      className="animate-spin h-5 w-5 text-current"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  }
-                >
-                  Agregar
-                </Button>
                 <Button
                   className="rounded-sm bg-red-200"
                   color="danger"

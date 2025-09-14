@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IParqueaderoF } from "../types/Person";
+import { IParqueaderoF, IVisitantesF } from "../types/Person";
 
 // Casas
 
@@ -107,3 +107,10 @@ export const updateParkingById = async (
 
 export const getAllVisits = async () =>
   await axios.get(`http://localhost:3000/getAllVisits`);
+
+export const createVisits = async (data: Omit<IVisitantesF, "id">) =>
+  await axios.post(`http://localhost:3000/createVisits`, data, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });

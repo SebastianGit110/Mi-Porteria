@@ -163,9 +163,9 @@ export const Parqueadero = () => {
     ),
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
-        alert(
-          `Haz hecho clic en: ${row.original.license} ${row.original.type}`
-        );
+        // alert(
+        //   `Haz hecho clic en: ${row.original.license} ${row.original.type}`
+        // );
       },
       style: {
         cursor: "pointer",

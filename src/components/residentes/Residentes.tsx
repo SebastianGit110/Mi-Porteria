@@ -204,9 +204,9 @@ export const Residentes = () => {
     ),
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
-        alert(
-          `Haz hecho clic en: ${row.original.name} ${row.original.last_name}`
-        );
+        // alert(
+        //   `Haz hecho clic en: ${row.original.name} ${row.original.last_name}`
+        // );
       },
       style: {
         cursor: "pointer",

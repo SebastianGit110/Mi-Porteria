@@ -15,6 +15,7 @@ import {
   deleteParkingById,
   updateParkingById,
   getAllVisits,
+  createVisits,
 } from "../controllers/data.controllers.js";
 
 const router = Router();
@@ -41,6 +42,7 @@ router.put("/updateParkingById", updateParkingById);
 
 // Visitantes
 router.get("/getAllVisits", getAllVisits);
+router.post("/createVisits", createVisits);
 
 // Imagenes
 router.post("/images/single", upload.single("photo"), (req, res) => {
@@ -49,7 +51,7 @@ router.post("/images/single", upload.single("photo"), (req, res) => {
     const newPath = saveImage(req.file);
 
     console.log("NEWPATH", newPath);
-    res.send("Termina");
+    res.send(newPath);
   } catch (error) {
     console.log;
   }

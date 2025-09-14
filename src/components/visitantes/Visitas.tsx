@@ -9,12 +9,19 @@ import { IVisitantesF } from "../../types/Person";
 import { getAllVisits } from "../../api/data";
 import { Chip } from "@heroui/chip";
 import { ModalVisitas } from "./ModalVisitas";
+import { ModalVisitasView } from "./ModalVisitasView";
 
 export const Visitas = () => {
   const [data, setData] = useState<IVisitantesF[]>([]);
+  const [currentVisit, setCurrentVisit] = useState<IVisitantesF | null>(null);
   const [refresh, setRefresh] = useState(false);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: isOpenVisit,
+    onOpen: onOpenVisit,
+    onOpenChange: onOpenChangeVisit,
+  } = useDisclosure();
 
   useEffect(() => {
     const fetchAllVisits = async () => {
@@ -54,6 +61,17 @@ export const Visitas = () => {
         enableHiding: false,
       },
       {
+        accessorKey: "name",
+        header: "Nombre",
+        muiTableHeadCellProps: {
+          style: {
+            color: "oklch(43.2% 0.095 166.913)",
+            fontSize: "14px",
+          },
+        },
+        enableHiding: false,
+      },
+      {
         accessorKey: "state",
         header: "Estado",
         Cell: ({ cell }) => {
@@ -66,14 +84,16 @@ export const Visitas = () => {
                 <Chip className="bg-green-200 text-green-800 font-semibold">
                   Entrada
                 </Chip>
-                <span>{value.entered}</span>
+                <span>
+                  {value.entered ? value.entered.replaceAll("T", " ") : ""}
+                </span>
               </div>
 
               <div className="flex flex-col items-center">
                 <Chip className="bg-red-200 text-red-800 font-semibold">
                   Salida
                 </Chip>
-                <span>{value.left}</span>
+                <span>{value.left ? value.left.replaceAll("T", " ") : ""}</span>
               </div>
             </div>
           );
@@ -175,7 +195,9 @@ export const Visitas = () => {
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
         console.log("fila", row.original);
-        alert(`Haz hecho clic en: ${row.original} ${row.original}`);
+        setCurrentVisit(row.original);
+        onOpenVisit();
+        // alert(`Haz hecho clic en: ${row.original} ${row.original}`);
       },
       style: {
         cursor: "pointer",
@@ -228,7 +250,16 @@ export const Visitas = () => {
         </div>
       </div>
 
-      <ModalVisitas isOpenVisitas={isOpen} onOpenChangeVisitas={onOpenChange} />
+      <ModalVisitas
+        isOpenVisitas={isOpen}
+        onOpenChangeVisitas={onOpenChange}
+        setRefresh={setRefresh}
+      />
+      <ModalVisitasView
+        isOpenVisitas={isOpenVisit}
+        onOpenChangeVisitas={onOpenChangeVisit}
+        currentVisit={currentVisit}
+      />
     </>
   );
 };

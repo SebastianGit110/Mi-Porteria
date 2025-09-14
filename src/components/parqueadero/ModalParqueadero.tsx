@@ -54,7 +54,12 @@ export function ModalParqueadero({ isOpen, onOpenChange, setRefresh }: Args) {
     }
 
     try {
-      const response = await createParking({ house_num, license, state, type });
+      const response = await createParking({
+        house_num,
+        license,
+        state: state === "Si" ? true : false,
+        type,
+      });
       toast.success(response.data.message);
 
       setRefresh((value: boolean) => !value);
